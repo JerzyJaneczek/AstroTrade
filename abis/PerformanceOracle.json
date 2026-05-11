@@ -1,0 +1,228 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "reporter",
+        "type": "address"
+      }
+    ],
+    "name": "ReporterUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "SnapshotPushed",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "from",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "to",
+        "type": "uint256"
+      }
+    ],
+    "name": "getHistory",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "navPerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalAUM",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeReturn",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "winRate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "sharpeRatio",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct PerformanceOracle.Snapshot[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      }
+    ],
+    "name": "getLatest",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "navPerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalAUM",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeReturn",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "winRate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "sharpeRatio",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct PerformanceOracle.Snapshot",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "navPerToken",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalAUM",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "cumulativeReturn",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "winRate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "sharpeRatio",
+        "type": "int256"
+      }
+    ],
+    "name": "pushSnapshot",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "reporter",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "reporter_",
+        "type": "address"
+      }
+    ],
+    "name": "setReporter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

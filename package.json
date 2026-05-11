@@ -1,0 +1,13 @@
+{
+  "name": "astrotrade",
+  "version": "1.0.0",
+  "description": "AstroTrade smart contracts",
+  "scripts": {
+    "compile": "hardhat compile",
+    "node": "hardhat node"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.0",
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstroTrade</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #07080f;
+  color: #dde4f5;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: #0d1020;
+  border-bottom: 1px solid #1c2448;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+.logo { font-size: 22px; font-weight: 700; letter-spacing: 1px; color: #7ba4ff; }
+.logo span { color: #b08dff; }
+.tabs { display: flex; gap: 4px; }
+.tab-btn {
+  padding: 8px 28px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #5568a0;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.tab-btn.active { background: #151e40; border-color: #2d45a0; color: #c8d8ff; }
+.tab-btn:hover:not(.active) { color: #9aabdf; }
+
+/* ── Layout ── */
+main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── Cards ── */
+.card {
+  background: #0e1120;
+  border: 1px solid #18203a;
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #7ba4ff;
+  margin-bottom: 22px;
+}
+.row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.row-header .card-title { margin-bottom: 0; }
+
+/* ── Forms ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 11px; color: #4a5e8a; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 500; }
+input, select, textarea {
+  background: #090c18;
+  border: 1px solid #18203a;
+  color: #dde4f5;
+  padding: 10px 13px;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: #3a5ce0; }
+textarea { resize: vertical; min-height: 75px; font-family: inherit; }
+select option { background: #0d1120; }
+
+/* ── Buttons ── */
+.btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: #2545c8; color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #3058e0; }
+.btn-ghost { background: #12193a; border: 1px solid #1e2e60; color: #7090d0; }
+.btn-ghost:hover:not(:disabled) { background: #161e40; color: #b0c4f0; }
+.btn-green { background: #0f3020; border: 1px solid #1a5535; color: #3dd080; }
+.btn-green:hover:not(:disabled) { background: #123825; }
+.btn-sm { padding: 5px 13px; font-size: 12px; border-radius: 6px; }
+
+/* ── Alerts ── */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-all;
+}
+.alert-ok  { background: #0b2018; border: 1px solid #175535; color: #3dd080; }
+.alert-err { background: #200b0b; border: 1px solid #552020; color: #e06060; }
+.alert-info { background: #0b1428; border: 1px solid #1a3060; color: #6090e0; }
+
+/* ── Agent grid ── */
+.agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.agent-card {
+  background: #090c18;
+  border: 1px solid #18203a;
+  border-radius: 10px;
+  padding: 20px;
+}
+.agent-card-name { font-size: 15px; font-weight: 600; color: #96b8ff; margin-bottom: 14px; }
+.kv { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+.kv-label { color: #3a5080; }
+.kv-val { color: #b8c8e8; font-family: monospace; font-size: 12px; }
+.agent-addr { font-size: 11px; color: #2a3c60; margin-top: 10px; word-break: break-all; }
+.agent-btns { margin-top: 14px; display: flex; gap: 8px; }
+
+/* ── Table ── */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 9px 14px; color: #3a5080; font-weight: 500; border-bottom: 1px solid #18203a; }
+td { padding: 10px 14px; border-bottom: 1px solid #0e1428; color: #b8c8e8; }
+td.mono { font-family: monospace; font-size: 11px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #0b0f1e; }
+td.dim   { color: #2a3c60; }
+td.green { color: #3dd080; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+.badge-on  { background: #0b2018; color: #3dd080; border: 1px solid #1a4a30; }
+.badge-off { background: #141414; color: #3a5060; border: 1px solid #202828; }
+
+/* ── Modal ── */
+.backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.backdrop.open { display: flex; }
+.modal {
+  background: #0e1120;
+  border: 1px solid #202e60;
+  border-radius: 12px;
+  padding: 28px;
+  width: 500px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-title { font-size: 16px; font-weight: 600; color: #7ba4ff; margin-bottom: 8px; }
+.modal-sub { font-size: 12px; color: #3a5080; margin-bottom: 20px; word-break: break-all; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+
+/* ── Misc ── */
+.spinner {
+  display: inline-block; width: 13px; height: 13px;
+  border: 2px solid #2a4ac0; border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .65s linear infinite;
+  vertical-align: middle; margin-right: 5px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { text-align: center; padding: 40px 0; color: #2a3a60; font-size: 14px; }
+
+/* ── Chain Data ── */
+.chain-meta { display:flex; gap:32px; flex-wrap:wrap; margin-bottom:4px; }
+.chain-meta-item { display:flex; flex-direction:column; gap:3px; }
+.chain-meta-label { font-size:11px; color:#3a5080; text-transform:uppercase; letter-spacing:.6px; }
+.chain-meta-value { font-size:20px; font-weight:600; color:#7ba4ff; font-family:monospace; }
+
+.agent-chain-card {
+  background: #090c18;
+  border: 1px solid #18203a;
+  border-radius:10px;
+  padding:20px;
+  margin-bottom:16px;
+}
+.agent-chain-name { font-size:16px; font-weight:700; color:#96b8ff; margin-bottom:16px; }
+.chain-sections { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:16px; }
+.chain-section-title {
+  font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.8px;
+  color:#4a5e8a; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #18203a;
+}
+.chain-kv { display:flex; justify-content:space-between; align-items:baseline;
+  margin-bottom:5px; font-size:12px; gap:8px; }
+.chain-kv-label { color:#3a5080; white-space:nowrap; }
+.chain-kv-val { color:#c0d0f0; font-family:monospace; text-align:right; word-break:break-all; }
+.chain-kv-val.green { color:#3dd080; }
+.chain-kv-val.red   { color:#e06060; }
+.chain-kv-val.dim   { color:#2a3c60; }
+.addr-full { font-size:11px; color:#3a5080; font-family:monospace; word-break:break-all; margin-top:2px; }
+
+.contract-role { font-size:12px; color:#5070a0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Astro<span>Trade</span></div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('trader', this)">Trader</button>
+    <button class="tab-btn"        onclick="switchTab('investor', this)">Investor</button>
+    <button class="tab-btn"        onclick="switchTab('chain', this)">Chain Data</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══════════════════════════ TRADER ══════════════════════════ -->
+  <div id="panel-trader" class="panel active">
+    <div class="card">
+      <div class="card-title">Deploy New Agent</div>
+      <form id="form-create">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Agent Name</label>
+            <input id="c-name" type="text" placeholder="e.g. BTC RSI Bot" required>
+          </div>
+          <div class="form-group full">
+            <label>Strategy Description (plain English)</label>
+            <textarea id="c-strategy" placeholder="e.g. Buy BTC when RSI &lt; 40 with a 10% trailing stop loss" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Initial Token Supply</label>
+            <input id="c-supply" type="number" value="1000000" required>
+          </div>
+          <div class="form-group">
+            <label>Min Investment (USDC, 1 USDC = 1 000 000)</label>
+            <input id="c-mininv" type="number" value="1000000" required>
+          </div>
+          <div class="form-group">
+            <label>Management Fee (bps, 100 = 1%)</label>
+            <input id="c-mgmt" type="number" value="200" required>
+          </div>
+          <div class="form-group">
+            <label>Performance Fee (bps, 2000 = 20%)</label>
+            <input id="c-perf" type="number" value="2000" required>
+          </div>
+          <div class="form-group">
+            <label>Max Drawdown (%)</label>
+            <input id="c-drawdown" type="number" value="20" required>
+          </div>
+          <div class="form-group">
+            <label>Max Position Size (%)</label>
+            <input id="c-position" type="number" value="10" required>
+          </div>
+          <div class="form-group">
+            <label>Trailing Stop (%)</label>
+            <input id="c-trailing" type="number" value="5" required>
+          </div>
+          <div class="form-group">
+            <label>Trader Account</label>
+            <select id="c-account"></select>
+          </div>
+        </div>
+        <div style="margin-top:22px">
+          <button class="btn btn-primary" type="submit" id="btn-deploy">Deploy Agent</button>
+        </div>
+        <div id="res-create"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ INVESTOR ══════════════════════════ -->
+  <div id="panel-investor" class="panel">
+
+    <!-- Account selector + portfolio -->
+    <div class="card">
+      <div class="row-header">
+        <div class="card-title">My Portfolio</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="portfolio-account" onchange="loadPortfolio()" style="width:260px"></select>
+          <button class="btn btn-ghost" onclick="loadPortfolio()">Refresh</button>
+        </div>
+      </div>
+      <div id="portfolio-wrap"><div class="empty">Select an account to see your token holdings</div></div>
+    </div>
+
+    <!-- Agents -->
+    <div class="card">
+      <div class="row-header">
+        <div class="card-title">Available Agents</div>
+        <button class="btn btn-ghost" onclick="loadAgents()">Refresh</button>
+      </div>
+      <div id="agents-wrap"><div class="empty">Click Refresh to load agents</div></div>
+    </div>
+
+    <!-- Marketplace -->
+    <div class="card">
+      <div class="row-header">
+        <div class="card-title">Marketplace</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="loadListings()">Refresh</button>
+          <button class="btn btn-primary" onclick="openModal('modal-list')">+ List Tokens</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Agent Token</th><th>Amount</th>
+              <th>Price / token (USDC)</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-listings">
+            <tr><td colspan="6" class="empty">Click Refresh to load listings</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /investor -->
+
+  <!-- ══════════════════════════ CHAIN DATA ══════════════════════════ -->
+  <div id="panel-chain" class="panel">
+    <div class="card">
+      <div class="row-header">
+        <div class="card-title">Blockchain Event Log</div>
+        <button class="btn btn-primary" onclick="loadChain()">Refresh</button>
+      </div>
+      <div id="chain-log"><div class="empty">Click Refresh to load events</div></div>
+    </div>
+  </div><!-- /chain -->
+
+</main>
+
+<!-- ══════════════════════════ MODALS ══════════════════════════ -->
+
+<!-- Deposit -->
+<div class="backdrop" id="modal-deposit">
+  <div class="modal">
+    <div class="modal-title">Deposit into Agent</div>
+    <div class="modal-sub" id="md-sub"></div>
+    <input type="hidden" id="md-vault">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>USDC Amount (1 USDC = 1 000 000 units)</label>
+        <input id="md-amount" type="number" value="1000000" min="1">
+      </div>
+      <div class="form-group full">
+        <label>Investor Account</label>
+        <select id="md-account"></select>
+      </div>
+    </div>
+    <div id="res-deposit"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-deposit')">Cancel</button>
+      <button class="btn btn-green" id="btn-deposit" onclick="submitDeposit()">Deposit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Buy -->
+<div class="backdrop" id="modal-buy">
+  <div class="modal">
+    <div class="modal-title">Buy Tokens</div>
+    <div class="modal-sub" id="mb-sub"></div>
+    <input type="hidden" id="mb-listing-id">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Amount of tokens (18-dec, 1e18 = 1 token)</label>
+        <input id="mb-amount" type="text" placeholder="1000000000000000000">
+      </div>
+      <div class="form-group full">
+        <label>Buyer Account</label>
+        <select id="mb-account"></select>
+      </div>
+    </div>
+    <div id="res-buy"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-buy')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitBuy()">Buy</button>
+    </div>
+  </div>
+</div>
+
+<!-- List -->
+<div class="backdrop" id="modal-list">
+  <div class="modal">
+    <div class="modal-title">List Agent Tokens for Sale</div>
+    <div class="modal-sub">Tokens will be held in escrow by the marketplace contract.</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Agent Token Address</label>
+        <input id="ml-token" type="text" placeholder="0x...">
+      </div>
+      <div class="form-group">
+        <label>Amount (18-dec units)</label>
+        <input id="ml-amount" type="text" placeholder="1000000000000000000">
+      </div>
+      <div class="form-group">
+        <label>Price per token (USDC micro-units)</label>
+        <input id="ml-price" type="number" placeholder="1000000">
+      </div>
+      <div class="form-group full">
+        <label>Seller Account</label>
+        <select id="ml-account"></select>
+      </div>
+    </div>
+    <div id="res-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-list')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitList()">List</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ACCOUNTS = [
+  { label:'Account 0 — Deployer', address:'0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', key:'0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' },
+  { label:'Account 1',            address:'0x70997970C51812dc3A010C7d01b50e0d17dc79C8', key:'0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d' },
+  { label:'Account 2',            address:'0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC', key:'0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a' },
+  { label:'Account 3',            address:'0x90F79bf6EB2c4f870365E785982E1f101E93b906', key:'0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6' },
+  { label:'Account 4',            address:'0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65', key:'0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926b' },
+];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function sel(id) { return document.getElementById(id); }
+
+function populateSelect(id) {
+  sel(id).innerHTML = ACCOUNTS.map((a,i) =>
+    `<option value="${i}">${a.label} — ${a.address.slice(0,10)}…</option>`
+  ).join('');
+}
+
+['c-account','md-account','mb-account','ml-account','portfolio-account'].forEach(populateSelect);
+
+function account(selectId) {
+  return ACCOUNTS[+sel(selectId).value];
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  sel('panel-' + name).classList.add('active');
+  if (name === 'investor') { loadPortfolio(); loadAgents(); loadListings(); }
+  if (name === 'chain')    { loadChain(); }
+}
+
+function openModal(id)  { sel(id).classList.add('open'); }
+function closeModal(id) {
+  sel(id).classList.remove('open');
+  const res = id.replace('modal-','res-');
+  if (sel(res)) sel(res).innerHTML = '';
+}
+
+function flash(id, type, html) {
+  sel(id).innerHTML = `<div class="alert alert-${type}">${html}</div>`;
+}
+
+function spin(btnId, on, label='') {
+  const b = sel(btnId);
+  if (!b) return;
+  b.disabled = on;
+  b.innerHTML = on ? `<span class="spinner"></span>Processing…` : label || b.textContent;
+}
+
+async function api(path, opts={}) {
+  const r = await fetch(path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  let data;
+  try {
+    data = await r.json();
+  } catch {
+    const text = await r.text().catch(() => '');
+    throw new Error(`Server error (HTTP ${r.status})${text ? ': ' + text.slice(0, 120) : ''}`);
+  }
+  if (!r.ok) throw new Error(data.detail || JSON.stringify(data));
+  return data;
+}
+
+function fmt6(n)  { return (Number(n) / 1e6).toFixed(6); }
+function fmt18(n) { return (Number(BigInt(String(n))) / 1e18).toFixed(4); }
+function short(addr) { return addr.slice(0,10) + '…' + addr.slice(-6); }
+
+// ── Create Agent ──────────────────────────────────────────────────────────────
+
+sel('form-create').addEventListener('submit', async e => {
+  e.preventDefault();
+  spin('btn-deploy', true);
+  sel('res-create').innerHTML = '';
+  const a = account('c-account');
+  try {
+    const d = await api('/api/trader/create-agent', {
+      method: 'POST',
+      body: JSON.stringify({
+        name:              sel('c-name').value,
+        strategy_description: sel('c-strategy').value,
+        initial_supply:    +sel('c-supply').value,
+        min_investment:    +sel('c-mininv').value,
+        mgmt_fee_bps:      +sel('c-mgmt').value,
+        perf_fee_bps:      +sel('c-perf').value,
+        max_drawdown_pct:  +sel('c-drawdown').value,
+        max_position_pct:  +sel('c-position').value,
+        trailing_stop_pct: +sel('c-trailing').value,
+        trader_address:    a.address,
+        private_key:       a.key,
+      }),
+    });
+    flash('res-create', 'ok',
+      `Agent deployed!<br>
+       <b>Index:</b> ${d.agent_index}<br>
+       <b>Token:</b> <code>${d.token_address}</code><br>
+       <b>Vault:</b> <code>${d.vault_address}</code>`
+    );
+    sel('form-create').reset();
+    sel('c-supply').value='1000000'; sel('c-mininv').value='1000000';
+    sel('c-mgmt').value='200'; sel('c-perf').value='2000';
+    sel('c-drawdown').value='20'; sel('c-position').value='10'; sel('c-trailing').value='5';
+  } catch(err) {
+    flash('res-create', 'err', `Error: ${err.message}`);
+  }
+  spin('btn-deploy', false, 'Deploy Agent');
+});
+
+// ── Portfolio ─────────────────────────────────────────────────────────────────
+
+async function loadPortfolio() {
+  const wrap = sel('portfolio-wrap');
+  const acct = account('portfolio-account');
+  wrap.innerHTML = '<div class="empty"><span class="spinner"></span>Loading…</div>';
+  try {
+    const holdings = await api(`/api/investor/portfolio?address=${acct.address}`);
+    if (!holdings.length) {
+      wrap.innerHTML = '<div class="empty">No agent tokens held by this account.</div>';
+      return;
+    }
+    wrap.innerHTML = `
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Token Address</th>
+              <th>Balance (tokens)</th>
+              <th>Pending Profits (USDC)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${holdings.map(h => `
+              <tr>
+                <td><b style="color:#96b8ff">${h.name}</b></td>
+                <td class="mono">${short(h.token_address)}</td>
+                <td>${fmt18(h.balance)}</td>
+                <td>${fmt6(h.pending_profits_usdc)}</td>
+                <td>
+                  <button class="btn btn-primary btn-sm"
+                    onclick="prefillList('${h.token_address}', '${h.balance}')">
+                    List for Sale
+                  </button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(err) {
+    wrap.innerHTML = `<div class="alert alert-err">Failed: ${err.message}</div>`;
+  }
+}
+
+function prefillList(tokenAddr, balance) {
+  // Sync the seller account to whoever is selected in the portfolio picker
+  sel('ml-account').value = sel('portfolio-account').value;
+  sel('ml-token').value = tokenAddr;
+  sel('ml-amount').value = balance;
+  sel('ml-price').value = '';
+  sel('res-list').innerHTML = '';
+  openModal('modal-list');
+}
+
+// ── Agents List ───────────────────────────────────────────────────────────────
+
+async function loadAgents() {
+  const wrap = sel('agents-wrap');
+  wrap.innerHTML = '<div class="empty"><span class="spinner"></span>Loading…</div>';
+  try {
+    const agents = await api('/api/investor/agents');
+    if (!agents.length) {
+      wrap.innerHTML = '<div class="empty">No agents yet — create one in the Trader tab.</div>';
+      return;
+    }
+    wrap.innerHTML = `<div class="agents-grid">${agents.map(agentCard).join('')}</div>`;
+  } catch(err) {
+    wrap.innerHTML = `<div class="alert alert-err">Failed: ${err.message}</div>`;
+  }
+}
+
+function agentCard(ag) {
+  const aum   = (ag.aum_usdc / 1e6).toFixed(2);
+  const perf  = ag.performance;
+  const perfHtml = perf
+    ? `<div class="kv"><span class="kv-label">Return</span><span class="kv-val">${(perf.cumulative_return_bps/100).toFixed(2)}%</span></div>
+       <div class="kv"><span class="kv-label">Win Rate</span><span class="kv-val">${(perf.win_rate_bps/100).toFixed(1)}%</span></div>`
+    : `<div class="kv"><span class="kv-label">Performance</span><span class="kv-val" style="color:#2a3c60">No data yet</span></div>`;
+  return `
+    <div class="agent-card">
+      <div class="agent-card-name">${ag.name}</div>
+      <div class="kv"><span class="kv-label">AUM</span><span class="kv-val">$${aum} USDC</span></div>
+      <div class="kv"><span class="kv-label">Trader</span><span class="kv-val">${short(ag.trader)}</span></div>
+      ${perfHtml}
+      <div class="agent-addr">Token: ${ag.token_address}</div>
+      <div class="agent-addr">Vault: ${ag.vault_address}</div>
+      <div class="agent-btns">
+        <button class="btn btn-green btn-sm"
+          onclick="openDepositModal('${ag.vault_address}','${ag.name}')">Deposit</button>
+      </div>
+    </div>`;
+}
+
+// ── Deposit ───────────────────────────────────────────────────────────────────
+
+function openDepositModal(vault, name) {
+  sel('md-vault').value = vault;
+  sel('md-sub').textContent = `${name} — vault ${short(vault)}`;
+  sel('res-deposit').innerHTML = '';
+  openModal('modal-deposit');
+}
+
+async function submitDeposit() {
+  spin('btn-deposit', true);
+  const a = account('md-account');
+  try {
+    const d = await api('/api/investor/deposit', {
+      method: 'POST',
+      body: JSON.stringify({
+        vault_address:    sel('md-vault').value,
+        usdc_amount:      +sel('md-amount').value,
+        investor_address: a.address,
+        private_key:      a.key,
+      }),
+    });
+    flash('res-deposit', 'ok',
+      `Deposited ${(d.usdc_deposited/1e6).toFixed(2)} USDC<br>
+       Tokens received: <b>${fmt18(d.tokens_received)}</b><br>
+       Tx: <code>${d.tx_hash.slice(0,20)}…</code>`
+    );
+    loadAgents();
+    loadPortfolio();
+  } catch(err) {
+    flash('res-deposit', 'err', `Error: ${err.message}`);
+  }
+  spin('btn-deposit', false, 'Deposit');
+}
+
+// ── Marketplace ───────────────────────────────────────────────────────────────
+
+async function loadListings() {
+  const tb = sel('tbody-listings');
+  tb.innerHTML = '<tr><td colspan="6" class="empty"><span class="spinner"></span>Loading…</td></tr>';
+  try {
+    const list = await api('/api/marketplace/listings');
+    if (!list.length) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty">No listings yet</td></tr>';
+      return;
+    }
+    tb.innerHTML = list.map(l => `
+      <tr>
+        <td>${l.listing_id}</td>
+        <td class="mono">${short(l.agent_token)}</td>
+        <td>${fmt18(l.amount)}</td>
+        <td>${fmt6(l.price_per_token)} USDC</td>
+        <td><span class="badge ${l.active ? 'badge-on':'badge-off'}">${l.active ? 'Active':'Filled'}</span></td>
+        <td>${l.active
+          ? `<button class="btn btn-primary btn-sm"
+               onclick="openBuyModal(${l.listing_id},'${l.agent_token}',${l.price_per_token})">Buy</button>`
+          : '—'}</td>
+      </tr>`).join('');
+  } catch(err) {
+    tb.innerHTML = `<tr><td colspan="6" style="color:#e06060;padding:16px">${err.message}</td></tr>`;
+  }
+}
+
+function openBuyModal(id, token, price) {
+  sel('mb-listing-id').value = id;
+  sel('mb-sub').textContent = `Listing #${id} — token ${short(token)} — price ${fmt6(price)} USDC/token`;
+  sel('res-buy').innerHTML = '';
+  openModal('modal-buy');
+}
+
+async function submitBuy() {
+  const a = account('mb-account');
+  try {
+    const d = await api('/api/marketplace/buy', {
+      method: 'POST',
+      body: JSON.stringify({
+        listing_id:    +sel('mb-listing-id').value,
+        amount:        sel('mb-amount').value,
+        buyer_address: a.address,
+        private_key:   a.key,
+      }),
+    });
+    flash('res-buy', 'ok',
+      `Purchase complete!<br>USDC spent: <b>${fmt6(d.usdc_spent)}</b><br>
+       Tx: <code>${d.tx_hash.slice(0,20)}…</code>`
+    );
+    loadListings();
+  } catch(err) {
+    flash('res-buy', 'err', `Error: ${err.message}`);
+  }
+}
+
+async function submitList() {
+  const a = account('ml-account');
+  try {
+    const d = await api('/api/marketplace/list', {
+      method: 'POST',
+      body: JSON.stringify({
+        agent_token_address: sel('ml-token').value,
+        amount:              parseInt(sel('ml-amount').value),
+        price_per_token:     +sel('ml-price').value,
+        seller_address:      a.address,
+        private_key:         a.key,
+      }),
+    });
+    flash('res-list', 'ok',
+      `Listed! Listing ID: <b>${d.listing_id}</b><br>
+       Tx: <code>${d.tx_hash.slice(0,20)}…</code>`
+    );
+    loadListings();
+  } catch(err) {
+    flash('res-list', 'err', `Error: ${err.message}`);
+  }
+}
+
+// ── Chain Data ────────────────────────────────────────────────────────────────
+
+const EVENT_COLOURS = {
+  AgentDeployed:        '#7ba4ff',
+  Deposited:            '#3dd080',
+  WithdrawalRequested:  '#f0b040',
+  WithdrawalExecuted:   '#f0b040',
+  TokensListed:         '#b08dff',
+  TokensBought:         '#3dd080',
+  ListingCancelled:     '#e06060',
+  RiskProfileSet:       '#60a0d0',
+  AgentHalted:          '#e06060',
+  AgentResumed:         '#3dd080',
+  ProfitsSettled:       '#3dd080',
+  SnapshotPushed:       '#60a0d0',
+  TradeExecuted:        '#f0b040',
+  ExecutorUpdated:      '#7ba4ff',
+  ReporterUpdated:      '#7ba4ff',
+  ProtocolFeeUpdated:   '#60a0d0',
+  FeeRecipientUpdated:  '#60a0d0',
+};
+
+// Human-readable descriptions of each event's args
+function fmtArgs(event, args) {
+  const rows = Object.entries(args).map(([k, v]) => {
+    let display = v;
+    // Format large token amounts
+    if ((k === 'usdcAmount' || k === 'totalCost' || k === 'pricePerToken' ||
+         k === 'amountPerToken' || k === 'profitAmount') && typeof v === 'number') {
+      display = `${fmt6(v)} USDC`;
+    } else if ((k === 'amount' || k === 'tokensMinted' || k === 'tokensBurned') && typeof v === 'number') {
+      display = `${fmt18(v)} tokens`;
+    } else if (typeof v === 'string' && v.startsWith('0x') && v.length === 66) {
+      display = v; // 32-byte hash — keep full
+    } else if (typeof v === 'string' && v.startsWith('0x') && v.length === 42) {
+      display = short(v); // address
+    }
+    return `<span style="color:#3a5080">${k}:</span> <span style="color:#c0d0f0">${display}</span>`;
+  });
+  return rows.join('  &nbsp;·&nbsp;  ');
+}
+
+async function loadChain() {
+  sel('chain-log').innerHTML = '<div class="empty"><span class="spinner"></span>Fetching events…</div>';
+  let logs;
+  try {
+    logs = await api('/api/chain/logs');
+  } catch(err) {
+    sel('chain-log').innerHTML = `<div class="alert alert-err">Failed: ${err.message}</div>`;
+    return;
+  }
+
+  if (!logs.length) {
+    sel('chain-log').innerHTML = '<div class="empty">No events found. Interact with the contracts first.</div>';
+    return;
+  }
+
+  sel('chain-log').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Block</th>
+          <th>Event</th>
+          <th>Contract</th>
+          <th>Args</th>
+          <th>Tx</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${logs.map(log => {
+          const colour = EVENT_COLOURS[log.event] || '#8090b0';
+          return `
+            <tr>
+              <td style="font-family:monospace;color:#4a5e8a">#${log.block_number}</td>
+              <td><span style="color:${colour};font-weight:600">${log.event}</span></td>
+              <td style="font-size:12px;color:#4a5e8a">${log.contract}</td>
+              <td style="font-size:12px">${fmtArgs(log.event, log.args)}</td>
+              <td class="mono" style="font-size:11px;color:#2a3c60">${log.tx_hash.slice(0,14)}…</td>
+            </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.backdrop').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+</script>
+</body>
+</html>
