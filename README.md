@@ -134,6 +134,27 @@ curl -X POST http://localhost:8000/api/marketplace/buy \
 
 ---
 
+## Tests
+
+56 tests across 8 files, written with Hardhat + Chai. Run with:
+
+```bash
+npm test
+```
+
+| File | Tests | What's covered |
+|---|---|---|
+| `MockUSDC.test.js` | 5 | Decimals, minting, ERC-20 transfer and approve |
+| `RiskManager.test.js` | 8 | Profile storage, trade validation, halt/resume access control, high-water mark |
+| `PerformanceOracle.test.js` | 8 | Reporter access control, snapshot fields, `getLatest`, `getHistory` range queries |
+| `AgentToken.test.js` | 8 | Initial mint, vault-only snapshot, proportional profit math, claim/reset, transfer checkpoint isolation |
+| `AgentVault.test.js` | 8 | Deposit scaling, withdrawal cooldown flow, executor/halt guards, profit settlement |
+| `AgentFactory.test.js` | 8 | Full deploy pipeline, agent registry, vault-token wiring, symbol derivation |
+| `AgentMarketplace.test.js` | 8 | Listing, buy (with fee split), partial buy, cancel, access control |
+| `Gas.test.js` | 3 | Gas regression guards for `deployAgent`, `deposit`, and `settleProfits` |
+
+---
+
 ## Smart Contract Function Outlines
 
 ---
