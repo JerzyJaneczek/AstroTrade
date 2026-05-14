@@ -4,10 +4,13 @@
   "description": "AstroTrade smart contracts",
   "scripts": {
     "compile": "hardhat compile",
-    "node": "hardhat node"
+    "node": "hardhat node",
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage"
   },
   "devDependencies": {
     "hardhat": "^2.22.0",
-    "@openzeppelin/contracts": "^5.0.0"
+    "@openzeppelin/contracts": "^5.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0"
   }
 }
