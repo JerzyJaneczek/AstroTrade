@@ -2,30 +2,32 @@
 
 A platform where traders create AI trading agents from plain English strategies and investors buy/sell tokenised shares in those agents.
 
+Work division can be found in **each what was built table**
+
 ---
 
 ## What Was Built
 
 **6 Solidity contracts** (Hardhat, OpenZeppelin, Solidity 0.8.24):
 
-| Contract | Description |
-|---|---|
-| `MockUSDC.sol` | Mintable ERC-20 used as USDC on the local test network |
-| `AgentToken.sol` | ERC-20 per agent with a per-token profit accumulator for profit sharing |
-| `AgentVault.sol` | Holds USDC deposits (1 USDC = 1 token), enforces withdrawal cooldown, settles profits |
-| `AgentFactory.sol` | Deploys Token + Vault pairs on demand and maintains an on-chain registry |
-| `RiskManager.sol` | Stores risk profiles per vault, validates trades, supports halt/resume |
-| `PerformanceOracle.sol` | Stores NAV and return snapshots pushed by the backend reporter |
-| `AgentMarketplace.sol` | Fixed-price secondary market for buying and selling agent tokens |
+| Contract | Description | Who built |
+|---|---|---|
+| `MockUSDC.sol` | Mintable ERC-20 used as USDC on the local test network | Jerzy |
+| `AgentToken.sol` | ERC-20 per agent with a per-token profit accumulator for profit sharing | Jerzy |
+| `AgentVault.sol` | Holds USDC deposits (1 USDC = 1 token), enforces withdrawal cooldown, settles profits | Jerzy |
+| `AgentFactory.sol` | Deploys Token + Vault pairs on demand and maintains an on-chain registry | Jerzy |
+| `RiskManager.sol` | Stores risk profiles per vault, validates trades, supports halt/resume | Hitesh |
+| `PerformanceOracle.sol` | Stores NAV and return snapshots pushed by the backend reporter | Hitesh |
+| `AgentMarketplace.sol` | Fixed-price secondary market for buying and selling agent tokens | Hitesh |
 
 **Python backend** (FastAPI + web3py, managed by Poetry):
 
-| File | Description |
-|---|---|
-| `backend/deploy.py` | One-shot deployment script — deploys all contracts and writes `addresses.json` |
-| `backend/web3_client.py` | Web3 connection, ABI loader, `send_tx` helper |
-| `backend/routes/trader.py` | `POST /api/trader/create-agent` |
-| `backend/routes/investor.py` | `GET /api/investor/agents`, deposit, withdrawal, marketplace buy/sell/cancel |
+| File | Description | Who built |
+|---|---|---|
+| `backend/deploy.py` | One-shot deployment script — deploys all contracts and writes `addresses.json` | Jerzy |
+| `backend/web3_client.py` | Web3 connection, ABI loader, `send_tx` helper | Hitesh |
+| `backend/routes/trader.py` | `POST /api/trader/create-agent` | Hitesh |
+| `backend/routes/investor.py` | `GET /api/investor/agents`, deposit, withdrawal, marketplace buy/sell/cancel | Hitesh |
 
 ---
 
