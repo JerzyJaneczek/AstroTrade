@@ -4,6 +4,12 @@ A platform where traders create AI trading agents from plain English strategies 
 
 Work division can be found in **each what was built table**
 
+Code Authors
+
+Panjabi, Hitesh Manoj (20909848)
+Janeczek, Jerzy Jan (20800341)
+
+
 ---
 
 ## What Was Built
